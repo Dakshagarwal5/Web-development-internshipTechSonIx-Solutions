@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Registration Form</title>
+  <style>
+    /* Center the form and set a light background */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    /* Style the form box */
+    .form-box {
+      background-color: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+      width: 100%;
+      max-width: 450px;
+    }
+
+    /* Group each input with its label and error */
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    /* Style labels for clarity */
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: #333;
+    }
+
+    /* Style input fields */
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    /* Error message styling */
+    .error-message {
+      color: #e63946;
+      font-size: 0.85em;
+      margin-top: 5px;
+      min-height: 1em; /* Keeps layout stable */
+    }
+
+    /* Submit button styling */
+    .submit-btn {
+      width: 100%;
+      padding: 12px;
+      background-color: #2a9d8f;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .submit-btn:hover {
+      background-color: #21867a;
+    }
+
+    .submit-btn:disabled {
+      background-color: #a0a0a0;
+      cursor: not-allowed;
+    }
+
+    /* Make it responsive for smaller screens */
+    @media (max-width: 500px) {
+      .form-box {
+        padding: 15px;
+        margin: 10px;
+      }
+      input, .submit-btn {
+        font-size: 14px;
+      }
+      label {
+        font-size: 13px;
+      }
+      .error-message {
+        font-size: 0.8em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Container for the form -->
+  <div class="form-box">
+    <h2>Sign Up</h2>
+    <form id="signupForm" novalidate>
+      <!-- Email input section -->
+      <div class="input-group">
+        <label for="userEmail">Email:</label>
+        <input type="email" id="userEmail" name="email" required>
+        <span id="emailError" class="error-message"></span>
+      </div>
+
+      <!-- Password input section -->
+      <div class="input-group">
+        <label for="userPass">Password:</label>
+        <input type="password" id="userPass" name="password" required>
+        <span id="passError" class="error-message"></span>
+      </div>
+
+      <!-- Confirm password input section -->
+      <div class="input-group">
+        <label for="confirmPass">Confirm Password:</label>
+        <input type="password" id="confirmPass" name="confirmPass" required>
+        <span id="confirmPassError" class="error-message"></span>
+      </div>
+
+      <!-- Submit button -->
+      <button type="submit" class="submit-btn" id="submitBtn" disabled>Sign Up</button>
+    </form>
+  </div>
+
+  <script>
+    // Grab all the elements we need from the DOM
+    const signupForm = document.getElementById('signupForm');
+    const emailField = document.getElementById('userEmail');
+    const passField = document.getElementById('userPass');
+    const confirmPassField = document.getElementById('confirmPass');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Error message elements
+    const emailErrorDisplay = document.getElementById('emailError');
+    const passErrorDisplay = document.getElementById('passError');
+    const confirmPassErrorDisplay = document.getElementById('confirmPassError');
+
+    // Patterns to check email and password
+    const emailCheckPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Simple email validation
+    const passCheckPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/; // Strong password check
+
+    // Show an error message under the field
+    function displayError(errorElement, message) {
+      errorElement.textContent = message;
+    }
+
+    // Clear the error message when input is fixed
+    function removeError(errorElement) {
+      errorElement.textContent = '';
+    }
+
+    // Check if the email is valid
+    function checkEmail() {
+      const emailValue = emailField.value.trim();
+      if (!emailValue) {
+        displayError(emailErrorDisplay, 'Email cannot be empty');
+        return false;
+      } else if (!emailCheckPattern.test(emailValue)) {
+        displayError(emailErrorDisplay, 'This is not a valid email');
+        return false;
+      } else {
+        removeError(emailErrorDisplay);
+        return true;
+      }
+    }
+
+    // Check if the password meets requirements
+    function checkPassword() {
+      const passValue = passField.value;
+      if (!passValue) {
+        displayError(passErrorDisplay, 'Password cannot be empty');
+        return false;
+      } else if (!passCheckPattern.test(passValue)) {
+        displayError(passErrorDisplay, 'Password needs 8+ characters, with upper, lower, number, and special char');
+        return false;
+      } else {
+        removeError(passErrorDisplay);
+        return true;
+      }
+    }
+
+    // Check if confirm password matches
+    function checkConfirmPassword() {
+      const passValue = passField.value;
+      const confirmValue = confirmPassField.value;
+      if (!confirmValue) {
+        displayError(confirmPassErrorDisplay, 'Please confirm your password');
+        return false;
+      } else if (passValue !== confirmValue) {
+        displayError(confirmPassErrorDisplay, 'Passwords don’t match');
+        return false;
+      } else {
+        removeError(confirmPassErrorDisplay);
+        return true;
+      }
+    }
+
+    // See if everything in the form is good to go
+    function isEverythingValid() {
+      const emailOk = checkEmail();
+      const passOk = checkPassword();
+      const confirmOk = checkConfirmPassword();
+      return emailOk && passOk && confirmOk;
+    }
+
+    // Turn the submit button on or off
+    function toggleSubmitButton() {
+      submitBtn.disabled = !isEverythingValid();
+    }
+
+    // Validate email as the user types
+    emailField.addEventListener('input', () => {
+      checkEmail();
+      toggleSubmitButton();
+    });
+
+    // Validate password as the user types
+    passField.addEventListener('input', () => {
+      checkPassword();
+      checkConfirmPassword(); // Check confirm too since it depends on password
+      toggleSubmitButton();
+    });
+
+    // Validate confirm password as the user types
+    confirmPassField.addEventListener('input', () => {
+      checkConfirmPassword();
+      toggleSubmitButton();
+    });
+
+    // Handle what happens when the user tries to submit
+    signupForm.addEventListener('submit', (event) => {
+      event.preventDefault(); // Stop the form from submitting right away
+      if (isEverythingValid()) {
+        alert('Great! Your form is valid and submitted.');
+        // You could send the form data to a server here
+      }
+    });
+  </script>
+</body>
+</html>
